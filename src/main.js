@@ -122,7 +122,7 @@ app.on("ready", () => {
 
 
   autoUpdater.logger = require("electron-log")
-  autoUpdater.logger.transports.file.level = "info"
+  autoUpdater.logger.transports.file.level = "warning"
   autoUpdater.checkForUpdatesAndNotify()
 
 });
