@@ -35,6 +35,7 @@ if (env.name !== "production") {
 
 function sendStatusToWindow(text) {
   log.info(text);
+  mainWindow.webContents.send("data.message", text)
 }
 
 const setApplicationMenu = () => {
