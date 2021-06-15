@@ -2,7 +2,7 @@
   "name": "sococo-electron-app",
   "productName": "Sococo",
   "description": "Sococo Electron App",
-  "version": "0.0.0-20210616",
+  "version": "0.0.0-20210617",
   "private": true,
   "author": "Trilogy",
   "copyright": "© 2021, Trilogy",
