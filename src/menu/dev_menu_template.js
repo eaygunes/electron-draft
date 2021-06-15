@@ -1,4 +1,5 @@
 import { app, BrowserWindow, dialog, session } from "electron";
+import os from 'os'
 
 let cookiesStr = null;
 
@@ -11,6 +12,17 @@ app.on("ready", () => {
     cookiesStr = error;
   })
 });
+
+const clipText = (text) => {
+  const maxLength = 90;
+  if (text.length < maxLength){
+    return text;
+  }
+
+  const ellipsis = '...';
+  const indexStart = 0;
+  return text.substr(indexStart, maxLength - ellipsis.length) + ellipsis
+} 
 
 export default {
   label: "Development",
@@ -30,26 +42,39 @@ export default {
       }
     },
     {
-      label: "Show Support Info",
+      label: "Show Local Storage",
       accelerator: "Alt+F1",
       click: () => {
-        const ses = session.fromPartition('persist:name')
-        const options = {
-          type: 'info',
-          title: 'Information',
-          message: `Store path: ${ses.getStoragePath()}\n Cookies: ${JSON.stringify(cookiesStr ?? 'Not Set')}`,
-          buttons: ['OK']
-        }
-        dialog.showMessageBox(options, (index) => {
-          event.sender.send('information-dialog-selection', index)
+        BrowserWindow.getFocusedWindow().webContents
+        .executeJavaScript('({...localStorage});', true)
+        .then(localStorage => {
+          let lines = []
+          const cognitoKey= "CognitoIdentityServiceProvider"
+          Object.keys(localStorage).sort((a, b) => a.localeCompare(b)).forEach(key => {
+            if (key.indexOf(cognitoKey) < 0){  //Skip cognito keys - not interested in amplify's own keys
+              lines.push(`${clipText(key)}: ${clipText(localStorage[key])}`)
+            }
+          })
 
-          // Query all cookies.
-          session.defaultSession.cookies.get({})
-            .then((cookies) => {
-              console.log(cookies)
-            }).catch((error) => {
-              console.log(error)
-            })
+          lines.push(`${os.EOL}(Cognito keys were skipped to keep the output readable.)`)
+          
+          const options = {
+            type: 'info',
+            title: 'Local Storage',
+            message: lines.join(os.EOL),
+            buttons: ['OK']
+          }
+          dialog.showMessageBox(options, (index) => {
+            event.sender.send('information-dialog-selection', index)
+  
+            // Query all cookies.
+            session.defaultSession.cookies.get({})
+              .then((cookies) => {
+                console.log(cookies)
+              }).catch((error) => {
+                console.log(error)
+              })
+          })
         })
       }
     }

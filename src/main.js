@@ -86,15 +86,13 @@ app.on("ready", () => {
   });
 
   mainWindow.loadURL('https://prod.sococo5k.com/');
-
-  
-
+  const versions = process.versions;
 
   mainWindow.webContents.on("did-finish-load", (event, input) => {
-    mainWindow.setTitle(`${app.getName()} ${app.getVersion()}`)
+    mainWindow.setTitle(`${app.getName()} ${app.getVersion()} (Electron:${versions.electron}, Node: ${versions.node}, Chrome: ${versions.chrome})`)
   })
 
-  const iconPath = path.join(__dirname, '..','resources', 'sococo.ico')
+  const iconPath = path.join(__dirname, '..', 'resources', 'sococo.ico')
   console.log(`Icon path: ${iconPath}`)
 
   tray = new Tray(iconPath)
@@ -117,19 +115,6 @@ app.on("ready", () => {
   ])
   tray.setToolTip('Sococo Electron App')
   tray.setContextMenu(trayContextMenu)
-
-  mainWindow.webContents
-  .executeJavaScript('({...localStorage});', true)
-  .then(localStorage => {
-    console.group("Local Storage:");
-    const maxLength = 64;
-    const indexStart = 0;
-    Object.keys(localStorage).sort((a, b) => a.localeCompare(b)).forEach(key => {
-      console.log(`${key.substr(indexStart, maxLength)}: ${localStorage[key].substr(indexStart, maxLength)}`)
-    })
-
-    console.groupEnd();
-  });
 });
 
 app.on("window-all-closed", () => {

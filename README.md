@@ -1,3 +1,5 @@
+# Cloned from
+https://github.com/szwacz/electron-boilerplate.git
 # electron-boilerplate
 
 Minimalistic, very easy to understand boilerplate for [Electron runtime](https://www.electronjs.org/). Tested on Windows, macOS and Linux.  
@@ -8,8 +10,6 @@ This project contains only bare minimum of tooling and dependencies to provide y
 
 Make sure you have [Node.js](https://nodejs.org) installed, then type...
 ```
-git clone https://github.com/szwacz/electron-boilerplate.git
-cd electron-boilerplate
 npm install
 npm start
 ```
