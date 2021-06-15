@@ -17,12 +17,13 @@ import devMenuTemplate from "./menu/dev_menu_template";
 import editMenuTemplate from "./menu/edit_menu_template";
 
 const contextMenu = require('electron-context-menu');
-
+const log = require("electron-log")
 
 
 // A reference here is needed otherwise tray will be garbage collected a few mins after app is loaded.
 // https://www.electronjs.org/docs/faq#my-apps-tray-disappeared-after-a-few-minutes
 let tray = null;
+let mainWindow = null;
 
 // Save userData in separate folders for each environment.
 // Thanks to this you can use production and development versions of the app
@@ -30,6 +31,10 @@ let tray = null;
 if (env.name !== "production") {
   const userDataPath = app.getPath("userData");
   app.setPath("userData", `${userDataPath} (${env.name})`);
+}
+
+function sendStatusToWindow(text) {
+  log.info(text);
 }
 
 const setApplicationMenu = () => {
@@ -74,7 +79,7 @@ app.on("ready", () => {
 
   const iconPath =  env.name === "production" ? path.join(process.resourcesPath, 'icon.ico') : path.join(__dirname, '..', 'resources', 'icon.ico');
 
-  const mainWindow = createWindow("main", {
+  mainWindow = createWindow("main", {
     width: 1000,
     height: 600,
     webPreferences: {
@@ -96,7 +101,6 @@ app.on("ready", () => {
     mainWindow.setTitle(`${app.getName()} ${app.getVersion()} (Electron:${versions.electron}, Node: ${versions.node}, Chrome: ${versions.chrome})`)
   })
 
-  
   console.log(`Icon path: ${iconPath}`)
 
   tray = new Tray(iconPath)
@@ -121,8 +125,32 @@ app.on("ready", () => {
   tray.setContextMenu(trayContextMenu)
 
 
-  autoUpdater.logger = require("electron-log")
-  autoUpdater.logger.transports.file.level = "warning"
+  autoUpdater.logger = log
+  autoUpdater.logger.transports.file.level = "info"
+
+  autoUpdater.on('checking-for-update', () => {
+    sendStatusToWindow('Checking for update...');
+  })
+  autoUpdater.on('update-available', (info) => {
+    sendStatusToWindow('Update available.');
+  })
+  autoUpdater.on('update-not-available', (info) => {
+    sendStatusToWindow('Update not available.');
+  })
+  autoUpdater.on('error', (err) => {
+    sendStatusToWindow('Error in auto-updater. ' + err);
+  })
+  autoUpdater.on('download-progress', (progressObj) => {
+    let log_message = "Download speed: " + progressObj.bytesPerSecond;
+    log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
+    log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
+    sendStatusToWindow(log_message);
+    mainWindow.setProgressBar(progressObj.percent)
+  })
+  autoUpdater.on('update-downloaded', (info) => {
+    sendStatusToWindow('Update downloaded');
+  });
+
   autoUpdater.checkForUpdatesAndNotify()
 
 });

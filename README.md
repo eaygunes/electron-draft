@@ -1,5 +1,28 @@
 # Cloned from
 https://github.com/szwacz/electron-boilerplate.git
+
+
+## Sococo Readme
+
+For general intro to electron builder, see the `Standard Readme` section below.
+
+In order to release a new version and push it to github, you need to:
+
+1) Configure github settings on build.publish section on package.json
+2) Set the environment variable GITHUB_TOKEN. The value should be your Github token. [Read more here](https://www.electron.build/configuration/publish#githuboptions).
+3) Run `npm run release`. This will push a new version (version string will come from the version you set on package.json)
+
+For auto update to works, you need to:
+1) Install the app by using the installer on the dist folder (this folder is created after running `npm run release`)
+-Do not run the app directly from there - it won't update the version at that folder.
+-When you run `npm start`, the app starts in dev mode. Auto update will not work on dev mode.
+2) Run the app from the start menu of your OS
+3) App will locate the new version (if any) and will instal it.
+4) Next time you run the app from the start menu, you will have the updated version.
+
+
+
+## Standard Readme
 # electron-boilerplate
 
 Minimalistic, very easy to understand boilerplate for [Electron runtime](https://www.electronjs.org/). Tested on Windows, macOS and Linux.  
