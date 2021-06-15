@@ -71,6 +71,8 @@ app.on("ready", () => {
     ]
   });
 
+  const iconPath =  env.name === "production" ? path.join(process.resourcesPath, 'icon.ico') : path.join(__dirname, '..', 'resources', 'icon.ico');
+
   const mainWindow = createWindow("main", {
     width: 1000,
     height: 600,
@@ -82,7 +84,8 @@ app.on("ready", () => {
       contextIsolation: false,
       // Spectron needs access to remote module
       enableRemoteModule: env.name === "test"
-    }
+    },
+    icon: iconPath
   });
 
   mainWindow.loadURL('https://prod.sococo5k.com/');
@@ -92,7 +95,7 @@ app.on("ready", () => {
     mainWindow.setTitle(`${app.getName()} ${app.getVersion()} (Electron:${versions.electron}, Node: ${versions.node}, Chrome: ${versions.chrome})`)
   })
 
-  const iconPath = path.join(__dirname, '..', 'resources', 'sococo.ico')
+  
   console.log(`Icon path: ${iconPath}`)
 
   tray = new Tray(iconPath)
