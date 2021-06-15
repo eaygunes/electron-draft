@@ -52,6 +52,7 @@
   },
   "dependencies": {
     "electron-context-menu": "^3.1.0",
+    "electron-log": "^4.3.5",
     "electron-updater": "^4.3.9",
     "fs-jetpack": "^4.1.0"
   },
