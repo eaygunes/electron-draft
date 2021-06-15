@@ -2,14 +2,14 @@
   "name": "sococo-electron-app",
   "productName": "Sococo",
   "description": "Sococo Electron App",
-  "version": "0.0.0-20210615",
+  "version": "0.0.0-20210616",
   "private": true,
   "author": "Trilogy",
   "copyright": "© 2021, Trilogy",
   "homepage": "https://prod.sococo5k.com",
   "main": "app/main.js",
   "build": {
-    "appId": "com.example.electron-boilerplate",
+    "appId": "trilogy.sococo-electron-draft",
     "directories": {
       "buildResources": "resources"
     },
@@ -25,9 +25,20 @@
         "filter": [
           "**/*"
         ]
-      }    
+      }
     ],
-    "publish": null
+    "win": {
+      "icon": "build/icon.ico"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "eaygunes",
+      "vPrefixedTagName": true,
+      "protocol": "https",
+      "private": true,
+      "releaseType": "release",
+      "publishAutoUpdate": true
+    }
   },
   "scripts": {
     "postinstall": "electron-builder install-app-deps",

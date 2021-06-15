@@ -14,6 +14,7 @@ import createWindow from "./helpers/window";
 import appMenuTemplate from "./menu/app_menu_template";
 import devMenuTemplate from "./menu/dev_menu_template";
 import editMenuTemplate from "./menu/edit_menu_template";
+import { autoUpdater } from "electron-updater"
 
 const contextMenu = require('electron-context-menu');
 
@@ -118,6 +119,12 @@ app.on("ready", () => {
   ])
   tray.setToolTip('Sococo Electron App')
   tray.setContextMenu(trayContextMenu)
+
+
+  autoUpdater.logger = require("electron-log")
+  autoUpdater.logger.transports.file.level = "info"
+  autoUpdater.checkForUpdatesAndNotify()
+
 });
 
 app.on("window-all-closed", () => {
