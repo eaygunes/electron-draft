@@ -21,11 +21,11 @@ For auto update to work, you need to:
 3) App will locate the new version (if any) and will install it.
 4) Next time you run the app from the start menu, you will have the updated version.
 
-![Update Message](readMeAssets/Sococo Electron - Update notification.jpg)
+![Update Message](readMeAssets/SococoElectronUpdateNotification.jpg)
 
 You can set this environment variable (ELECTRON_ENABLE_LOGGING=1) to redirect electron console logs to Chrome console:
 
-![Update Logs redirected to Console](readMeAssets/Sococo Electron - Update log messages.jpg)
+![Update Logs redirected to Console](readMeAssets/SococoElectronUpdateLogMessages.jpg)
 
 
 
