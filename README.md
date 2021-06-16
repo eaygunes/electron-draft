@@ -13,7 +13,7 @@ In order to release a new version and push it to github, you need to:
 2) Set the environment variable GITHUB_TOKEN. The value should be your or CI's Github token. [Read more here](https://www.electron.build/configuration/publish#githuboptions).
 3) Run `npm run release`. This will push a new version (version string will come from the version you set on package.json)
 
-For auto update to works, you need to:
+For auto update to work, you need to:
 1) Install the app by using the installer on the dist folder (this folder is created after running `npm run release`)
 -Do not run the app directly from there - it won't update the version at that folder.
 -When you run `npm start`, the app starts in dev mode. Auto update will not work on dev mode.
@@ -21,11 +21,11 @@ For auto update to works, you need to:
 3) App will locate the new version (if any) and will install it.
 4) Next time you run the app from the start menu, you will have the updated version.
 
-![Update Message](./readMeAssets/Sococo Electron - Update notification.jpg)
+![Update Message](readMeAssets/Sococo Electron - Update notification.jpg)
 
 You can set this environment variable (ELECTRON_ENABLE_LOGGING=1) to redirect electron console logs to Chrome console:
 
-![Update Logs redirected to Console](./readMeAssets/Sococo Electron - Update log messages.jpg)
+![Update Logs redirected to Console](readMeAssets/Sococo Electron - Update log messages.jpg)
 
 
 
