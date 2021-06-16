@@ -18,7 +18,40 @@ import editMenuTemplate from "./menu/edit_menu_template";
 
 const contextMenu = require('electron-context-menu');
 const log = require("electron-log")
+const appUrl = "https://prod.sococo5k.com"
 
+
+
+app.on('web-contents-created', (event, contents) => {
+
+  // https://www.electronjs.org/docs/tutorial/security#11-verify-webview-options-before-creation
+  contents.on('will-attach-webview', (event, webPreferences, params) => {
+    // Strip away preload scripts if unused or verify their location is legitimate
+    delete webPreferences.preload
+    delete webPreferences.preloadURL
+
+    // Disable Node.js integration
+    webPreferences.nodeIntegration = false
+
+    // Enable context isolation
+    webPreferences.contextIsolation = true
+
+    // Verify URL being loaded
+    if (!params.src.startsWith(appUrl)) {
+      event.preventDefault()
+    }
+  })
+
+  // https://www.electronjs.org/docs/tutorial/security#12-disable-or-limit-navigation
+  contents.on('will-navigate', (event, navigationUrl) => {
+    const parsedUrl = new URL(navigationUrl)
+
+    if (parsedUrl.origin !== appUrl) {
+      event.preventDefault()
+    }
+  })
+  
+})
 
 // A reference here is needed otherwise tray will be garbage collected a few mins after app is loaded.
 // https://www.electronjs.org/docs/faq#my-apps-tray-disappeared-after-a-few-minutes
@@ -61,6 +94,22 @@ const initIpc = () => {
 };
 
 app.on("ready", () => {
+
+  // https://www.electronjs.org/docs/tutorial/security#4-handle-session-permission-requests-from-remote-content
+  session.defaultSession.setPermissionRequestHandler((webContents, permission, callback) => {
+    const url = webContents.getURL()
+
+    let permissionGranted = url.startsWith(appUrl) && (permission === 'notifications' || permission === 'media');
+    
+    if (permissionGranted){
+      log.info(`Permission granted. Permission: ${permission}, URL: ${url}`)
+    }else{
+      log.error(`Permission denied. Permission: ${permission}, URL: ${url}`)
+    }
+
+    callback(permissionGranted);
+  })
+
   setApplicationMenu();
   initIpc();
 
@@ -149,7 +198,7 @@ app.on("ready", () => {
     {
       label: "Toggle DevTools",
       type: 'normal',
-      accelerator: "Alt+CmdOrCtrl+I",
+      accelerator: "F12",
       click: () => {
         mainWindow.toggleDevTools();
       }
