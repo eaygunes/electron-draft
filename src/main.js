@@ -33,16 +33,20 @@ if (env.name !== "production") {
   app.setPath("userData", `${userDataPath} (${env.name})`);
 }
 
+// In case you want to pass info from the main process (node js) to the rendered process (browser window),
+// you can use ipcMain (https://www.electronjs.org/docs/api/ipc-main) or call mainWindow.webContents.send(...) 
+// within this function and then handle the data on Sococo Frontend.
 function sendStatusToWindow(text) {
   log.info(text);
-  mainWindow.webContents.send("data.message", text)
 }
 
 const setApplicationMenu = () => {
   const menus = [appMenuTemplate, editMenuTemplate];
+  
   if (env.name !== "production") {
     menus.push(devMenuTemplate);
   }
+
   Menu.setApplicationMenu(Menu.buildFromTemplate(menus));
 };
 
@@ -78,7 +82,8 @@ app.on("ready", () => {
     ]
   });
 
-  const iconPath =  env.name === "production" ? path.join(process.resourcesPath, 'icon.ico') : path.join(__dirname, '..', 'resources', 'icon.ico');
+  //Paths on dev and production differ depending on how you start the app on dev (i.e. the start command on package.json)
+  const iconPath = env.name === "production" ? path.join(process.resourcesPath, 'icon.ico') : path.join(__dirname, '..', 'resources', 'icon.ico');
 
   mainWindow = createWindow("main", {
     width: 1000,
@@ -95,15 +100,54 @@ app.on("ready", () => {
     icon: iconPath
   });
 
+  //Not needed - Kept here for quick testing purposes only
+  /*
+  const window2 = createWindow("window2", {
+    parent: mainWindow,
+    modal: true,
+    width: 320,
+    height: 320,
+    useContentSize: true,
+    icon: iconPath,
+    resizable: false,
+    webPreferences: {
+      // Two properties below are here for demo purposes, and are
+      // security hazard. Make sure you know what you're doing
+      // in your production app.
+      nodeIntegration: true,
+      contextIsolation: false,
+      // Spectron needs access to remote module
+      enableRemoteModule: env.name === "test"
+    },
+  });
+
+  window2.loadURL(
+    url.format({
+      pathname: path.join(__dirname, "app.html"),
+      protocol: "file:",
+      slashes: true
+    })
+  );
+*/
+
+  
+  // This is how the electron app is connected to the Sococo backend
   mainWindow.loadURL('https://prod.sococo5k.com/');
   const versions = process.versions;
 
+  //By default, the title comes from the app name on package JSON.
+  // The code below allows overriding that title without changing the package JSON.
   mainWindow.webContents.on("did-finish-load", (event, input) => {
     mainWindow.setTitle(`${app.getName()} ${app.getVersion()} (Electron:${versions.electron}, Node: ${versions.node}, Chrome: ${versions.chrome})`)
   })
 
-  console.log(`Icon path: ${iconPath}`)
+  //For troubleshooting only
+  //console.log(`Icon path: ${iconPath}`)
 
+  // Although the tray is not used anywhere else, we have to define the variable at top level
+  // so that it is not garbage collected. Otherwise, ca 1 min after your app started,
+  // the tray menu will disappear.
+  // https://www.electronjs.org/docs/faq#my-apps-tray-disappeared-after-a-few-minutes
   tray = new Tray(iconPath)
 
   const trayContextMenu = Menu.buildFromTemplate([
@@ -125,7 +169,6 @@ app.on("ready", () => {
   tray.setToolTip('Sococo Electron App')
   tray.setContextMenu(trayContextMenu)
 
-
   autoUpdater.logger = log
   autoUpdater.logger.transports.file.level = "info"
 
@@ -141,6 +184,7 @@ app.on("ready", () => {
   autoUpdater.on('error', (err) => {
     sendStatusToWindow('Error in auto-updater. ' + err);
   })
+
   autoUpdater.on('download-progress', (progressObj) => {
     let log_message = "Download speed: " + progressObj.bytesPerSecond;
     log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
@@ -148,10 +192,12 @@ app.on("ready", () => {
     sendStatusToWindow(log_message);
     mainWindow.setProgressBar(progressObj.percent)
   })
+
   autoUpdater.on('update-downloaded', (info) => {
     sendStatusToWindow('Update downloaded');
   });
 
+  //This is the line that triggers auto update check & update execution
   autoUpdater.checkForUpdatesAndNotify()
 
 });

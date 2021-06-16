@@ -27,7 +27,7 @@ You can set this environment variable (ELECTRON_ENABLE_LOGGING=1) to redirect el
 
 ![Update Logs redirected to Console](readMeAssets/SococoElectronUpdateLogMessages.jpg)
 
-
+Make sure you remove hello world and unused HTML code from the repo before creating a prod release. They were kept on the codebase for testing purposes only. 
 
 ## Standard Readme (Cloned from electron-boilerplate repo)
 # electron-boilerplate
